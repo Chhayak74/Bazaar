@@ -15,7 +15,7 @@ const register = async ({
   const salt = randomBytes(16).toString('hex');
   const hashedPassword = scryptSync(password, salt, 64).toString('hex');
 
-  const { insertedId } = await db.get().collection('users').insertOne({
+  const { insertedId } = await db.get().collection('users').findOneAndUpdate({
     email,
     secret: `${salt}:${hashedPassword}`,
     type

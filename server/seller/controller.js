@@ -4,13 +4,15 @@ const createCatalog = async (req, res, next) => {
     const {
       name,
       imgUrl,
-      category 
+      category,
+      products
     } = req.body;
 
     const data = await service.createCatalog({
       name,
       imgUrl,
       category,
+      products,
       userId: req.user._id
     });
     return res.send(data);

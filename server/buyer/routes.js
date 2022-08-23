@@ -9,8 +9,8 @@ buyerRouter.use(bodyParser.urlencoded({ extended: true }));
 buyerRouter.use(bodyParser.text());
 
 buyerRouter.get('/list-of-sellers', middleware.authenticate, controller.listSellers);
-buyerRouter.get('/seller-catalog/:seller_id', controller.getCatalog);
-buyerRouter.post('/create-order/:seller_id', controller.createOrder);
+buyerRouter.get('/seller-catalog/:seller_id', middleware.authenticate, controller.getCatalog);
+buyerRouter.post('/create-order/:seller_id', middleware.authenticate, controller.createOrder);
 
 
 module.exports =  buyerRouter;

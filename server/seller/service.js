@@ -1,22 +1,26 @@
 const { ObjectId } = require('mongodb');
-const { scryptSync, randomBytes, timingSafeEqual } = require('crypto');
-const db = require('../db/mongo/connection.js');
-const jwt = require('./jwt.js');
+const db = require('../utils/connection.js');
 const createCatalog = async ({
   name,
   imgUrl,
   category,
-  userId
+  userId,
+  products
 }) => {
-  const { insertedId } = await db.get().collection('catalog').insertOne({
-    name,
-    imgUrl,
-    category,
-    userId: ObjectId(userId)
+  const response = await db.get().collection('catalogs').findOneAndUpdate({
+    name
+  }, {
+    $set: {
+      name,
+      imgUrl,
+      category,
+      products,
+      userId: ObjectId(userId)
+    }
   }, {
     upsert: true
   });
-  if (insertedId) return { success: true };
+  if (response.insertedId || response.lastErrorObject?.updatedExisting) return { success: true };
   return { success: false };
 }
 

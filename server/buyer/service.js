@@ -3,7 +3,7 @@ const { ObjectId } = require('mongodb');
 const db = require('../utils/connection.js');
 
 const listSellers = async () => {
-  const sellersList = await db.get().collection('catalog').find();
+  const sellersList = await db.get().collection('catalogs').find().toArray();
   if(!sellersList || !Array.isArray(sellersList) || sellersList.length == 0) {
     return {
       status: 200,
@@ -20,7 +20,7 @@ const listSellers = async () => {
 const getCatalog = async ({
   sellerId
 }) => {
-  const catalog = await db.get().collection('catalog').find({ _id: ObjectId(sellerId) });
+  const catalog = await db.get().collection('catalogs').find({ _id: ObjectId(sellerId) }).toArray();
   if(!catalog || !Array.isArray(catalog) || catalog.length == 0) {
     return {
       status: 200,
