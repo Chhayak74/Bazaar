@@ -1,0 +1,27 @@
+{
+  "name": "bazaar",
+  "version": "1.0.0",
+  "description": "REST API for an e-commerce marketplace",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chhayak74/Bazaar.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chhayak74/Bazaar/issues"
+  },
+  "homepage": "https://github.com/Chhayak74/Bazaar#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.9.0"
+  }
+}
