@@ -60,30 +60,33 @@ const createOrder = async ({
   products,
   address
 }) => {
-  const response = await db.get('orders').findOneAndUpdate({
-    sellerId: ObjectId(userId),
+  const { lastErrorObject: { upserted, updatedExisting }, value } = await db.get('orders').findOneAndUpdate({
+    sellerId: ObjectId(sellerId),
     userId: ObjectId(userId)
   }, {
-    $set: {
+    $setOnInsert: {
       sellerId: ObjectId(sellerId),
       userId: ObjectId(userId),
-      address,
-      products: products.map(({ productId, qty }) => ({
-        productId: ObjectId(productId),
-        status: process.env.DEFAULT_ORDER_STATUS,
-        qty
-      })),
+      address
+    },
+    $push: {
+      products: {
+        $each: products.map(({ productId, qty }) => ({
+          productId: ObjectId(productId),
+          status: process.env.DEFAULT_ORDER_STATUS,
+          qty
+        }))
+      }
     }
   }, {
     upsert: true
   });
-  if (response.lastErrorObject?.upserted || response.lastErrorObject.updatedExisting) return {
+  if (upserted || updatedExisting) return {
     statusCode: 200,
     data: {
       message: 'order placed successfully'
     }
   };
-  console.log(response);
   return {
     statusCode: 500,
     data: {

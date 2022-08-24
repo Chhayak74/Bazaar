@@ -9,28 +9,32 @@ const createCatalog = async ({
   userId,
   products
 }) => {
-  const response = await db.get('catalogs').findOneAndUpdate({
+  const { lastErrorObject: { upserted, updatedExisting }, value } = await db.get('catalogs').findOneAndUpdate({
     name
   }, {
-    $set: {
+    $setOnInsert: {
       name,
       imgUrl,
       category,
-      products: products.map(product => ({
-        _id: new ObjectId(),
-        currency: process.env.DEFAULT_PRODUCT_CURRENCY,
-        ...product
-      })),
       sellerId: ObjectId(userId)
+    },
+    $push: {
+      products: {
+        $each: products.map(product => ({
+          _id: new ObjectId(),
+          currency: process.env.DEFAULT_PRODUCT_CURRENCY,
+          ...product
+        }))
+      }
     }
   }, {
     upsert: true
   });
-  if (response.lastErrorObject?.upserted || response.lastErrorObject.updatedExisting) return {
+  if (upserted || updatedExisting) return {
     statusCode: 200,
     data: {
       message: 'Catalog created/updated successfully',
-      catalogId: String(response.value?._id)
+      catalogId: updatedExisting? String(value?._id) : String(upserted)
     }
   };
   return {
