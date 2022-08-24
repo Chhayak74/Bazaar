@@ -36,7 +36,7 @@ Sample Response -
 }
 ```
 
-2. POST /api/auth/login
+2. POST `/api/auth/login`
 Let a previously registered user log in (e.g. retrieve authentication token)
 Sample Payload - 
 ```
@@ -55,7 +55,7 @@ Sample Response -
 
 ## APIs for buyers
 
-1. GET /api/buyer/list-of-sellers
+1. GET `/api/buyer/list-of-sellers`
 Get a list of all sellers
 
 Sample Response -
@@ -72,7 +72,7 @@ Sample Response -
 }
 ```
 
-2. GET /api/buyer/seller-catalog/:seller_id
+2. GET `/api/buyer/seller-catalog/:seller_id`
 Get the catalog of a seller by seller_id
 
 Sample Response -
@@ -107,7 +107,7 @@ Sample Response -
 }
 ```
 
-3. POST /api/buyer/create-order/:seller_id
+3. POST `/api/buyer/create-order/:seller_id`
 Send a list of items to create an order for seller with id = seller_id
 
 Sample Payload - 
@@ -129,7 +129,7 @@ Sample Response -
 
 ## APIs for sellers
 
-1. POST /api/seller/create-catalog
+1. POST `/api/seller/create-catalog`
 Send a list of items to create a catalog for a seller
 
 Sample Payload - 
@@ -167,7 +167,7 @@ Sample Response -
 }
 ```
 
-2. GET /api/seller/orders
+2. GET `/api/seller/orders`
 Retrieve the list of orders received by a seller
 
 Sample Response -
