@@ -15,7 +15,17 @@ const listSellers = async () => {
   return {
     statusCode: 200,
     data: {
-      sellersList
+      sellersList: sellersList.map(({
+        name,
+        category,
+        imgUrl,
+        sellerId
+      }) => ({
+        name,
+        category,
+        imgUrl,
+        sellerId
+      }))
     }
   }
 }

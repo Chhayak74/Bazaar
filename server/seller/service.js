@@ -44,7 +44,7 @@ const createCatalog = async ({
 const orders = async ({
   sellerId
 }) => {
-  const orders = await db.get('orders').find({ sellerId: ObjectId(sellerId) });
+  const orders = await db.get('orders').find({ sellerId: ObjectId(sellerId) }).toArray();
   if (!orders || !Array.isArray(orders) || orders.length == 0) {
     return {
       statusCode: 200,
