@@ -16,7 +16,9 @@ const createCatalog = async ({
       name,
       imgUrl,
       category,
-      sellerId: ObjectId(userId)
+      sellerId: ObjectId(userId),
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     $push: {
       products: {

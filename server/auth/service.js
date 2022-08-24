@@ -23,7 +23,9 @@ const register = async ({
   const { insertedId } = await db.get('users').insertOne({
     email,
     secret: `${salt}:${hashedPassword}`,
-    type
+    type,
+    createdAt: new Date(),
+    updatedAt: new Date()
   }, {
     upsert: true
   }).catch((dbErr) => {
@@ -63,26 +65,26 @@ const login = async ({
       }
     };
   }
-  const[salt, key] = user.secret.split(':');
+  const [salt, key] = user.secret.split(':');
   const hashedBuffer = scryptSync(password, salt, 64);
   const keyBuffer = Buffer(key, 'hex');
   const match = timingSafeEqual(hashedBuffer, keyBuffer);
 
   if (match) {
-    return { 
+    return {
       statusCode: 200,
       data: {
-        token : await getToken(user._id),
+        token: await getToken(user._id),
         message: 'Login success!'
       }
-     };
+    };
   } else {
-    return { 
+    return {
       statusCode: 500,
       data: {
         message: 'Something went wrong. Login failed!'
       }
-     };
+    };
   }
 }
 

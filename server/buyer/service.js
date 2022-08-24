@@ -67,7 +67,9 @@ const createOrder = async ({
     $setOnInsert: {
       sellerId: ObjectId(sellerId),
       userId: ObjectId(userId),
-      address
+      address,
+      createdAt: new Date(),
+      updatedAt: new Date()
     },
     $push: {
       products: {
