@@ -9,7 +9,7 @@ const authenticate = async (req, res, next) => {
     res.set('Authorization', `Bearer ${token}`);
     next();
   } catch (err) {
-    next(new Error(err));
+    next(res.status(400).send({ message: 'Authentication error' }));
   }
 }
 

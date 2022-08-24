@@ -1,42 +1,44 @@
-const service = require( './service.js');
+const service = require('./service.js');
+const validation = require('./validation.js');
 
 const register = async (req, res, next) => {
   try {
+    await validation.register(req.body);
     const {
       email,
       password,
       type
     } = req.body;
-    const token = await service.register({
+    const { statusCode, data } = await service.register({
       email,
       password,
       type
     });
-    return res.send({
-      statusCode: 200,
-      token
-    });
+    return res.status(statusCode).send(data);
   } catch (ex) {
-    return next(ex);
+    console.log(ex);
+    return res.status(400).send({
+      message: ex.message ?? ex
+    });
   }
 };
 
 const login = async (req, res, next) => {
   try {
+    await validation.login(req.body);
     const { email, password } = req.body;
-    const token = await service.login({
+    const { statusCode, data } = await service.login({
       email, password
     });
-    return res.send({
-      statusCode: 200,
-      token
-    });
+    return res.status(statusCode).send(data);
   } catch (ex) {
     console.log(ex);
-    return next(ex);
+    return res.status(400).send({
+      message: ex.message ?? ex
+    });
   }
 }
-module.exports =  {
+module.exports = {
   login,
   register
 };

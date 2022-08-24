@@ -9,7 +9,7 @@ const token = (sub) => {
 
 const  authVerify = async(token) =>  {
   const { sub } = jwt.decode(token);
-  const user = await db.get().collection('users').findOne({ _id: ObjectId(sub)});
+  const user = await db.get('users').findOne({ _id: ObjectId(sub)});
   jwt.verify(token, process.env.SECRET_KEY, { expiresIn: '1h'});
   return { token: jwt.sign({ sub }, process.env.SECRET_KEY, { expiresIn: '1h'}), user };
 }

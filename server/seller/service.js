@@ -1,5 +1,7 @@
 const { ObjectId } = require('mongodb');
+
 const db = require('../utils/connection.js');
+
 const createCatalog = async ({
   name,
   imgUrl,
@@ -7,37 +9,53 @@ const createCatalog = async ({
   userId,
   products
 }) => {
-  const response = await db.get().collection('catalogs').findOneAndUpdate({
+  const response = await db.get('catalogs').findOneAndUpdate({
     name
   }, {
     $set: {
       name,
       imgUrl,
       category,
-      products,
-      userId: ObjectId(userId)
+      products: products.map(product => ({
+        _id: new ObjectId(),
+        currency: process.env.DEFAULT_PRODUCT_CURRENCY,
+        ...product
+      })),
+      sellerId: ObjectId(userId)
     }
   }, {
     upsert: true
   });
-  if (response.insertedId || response.lastErrorObject?.updatedExisting) return { success: true };
-  return { success: false };
+  if (response.lastErrorObject?.upserted || response.lastErrorObject.updatedExisting) return {
+    statusCode: 200,
+    data: {
+      message: 'Catalog created/updated successfully',
+      catalogId: String(response.value?._id)
+    }
+  };
+  return {
+    statusCode: 500,
+    data: {
+      message: 'Something went wrong'
+    }
+  };
 }
-
 
 const orders = async ({
   sellerId
 }) => {
-  const orders = await db.get().collection('orders').find({ sellerId: ObjectId(sellerId) });
+  const orders = await db.get('orders').find({ sellerId: ObjectId(sellerId) });
   if (!orders || !Array.isArray(orders) || orders.length == 0) {
     return {
-      status: 200,
-      message: 'no new orders'
+      statusCode: 200,
+      data: {
+        message: 'No new orders'
+      }
     }
   }
   return {
-    status: 200,
-    orders
+    statusCode: 200,
+    data: { orders }
   }
 }
 

@@ -1,45 +1,57 @@
 const service = require( './service.js');
+const validation = require('./validation.js');
+
 const listSellers = async (req, res, next) => {
   try {
-    const data = await service.listSellers();
-    return res.send(data);
+    const { statusCode, data} = await service.listSellers();
+    return res.status(statusCode).send(data);
   } catch (ex) {
-    return next(ex);
+    console.log(ex);
+    return res.status(400).send({
+      message: ex.message ?? ex
+    });
   }
 };
 
 const getCatalog = async (req, res, next) => {
   try {
-    const sellerId  = req.params.seller_id;;
-    const data = await service.getCatalog({
-      sellerId
-    });
-    return res.send(data);
+    const payload = {
+      sellerId: req.params.seller_id
+    }
+    await validation.getCatalog(payload);
+    const { statusCode, data} = await service.getCatalog(payload);
+    return res.status(statusCode).send(data);
   } catch (ex) {
     console.log(ex);
-    return next(ex);
+    return res.status(400).send({
+      message: ex.message ?? ex
+    });
   }
 }
 
 const createOrder = async (req, res, next) => {
   try {
-    const sellerId  = req.params.seller_id;
+    const payload = {
+      sellerId: req.params.seller_id,
+      ...req.body
+    }
+    await validation.createOrder(payload);
     const {
       products,
-      address,
-      status
+      address
     } = req.body;
-    const data = await service.createOrder({
-      sellerId,
+    const { statusCode, data} = await service.createOrder({
+      sellerId: payload.sellerId,
       userId: req.user._id,
       products,
-      address,
-      status
+      address
     });
-    return res.send(data);
+    return res.status(statusCode).send(data);
   } catch (ex) {
     console.log(ex);
-    return next(ex);
+    return res.status(400).send({
+      message: ex.message ?? ex
+    });
   }
 }
 

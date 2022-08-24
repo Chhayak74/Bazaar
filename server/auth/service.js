@@ -8,22 +8,45 @@ const register = async ({
   password,
   type
 }) => {
-  const user = await db.get().collection('users').findOne({ email });
+  const user = await db.get('users').findOne({ email });
   if (user) {
-    throw new Error('User is already registered');
+    return {
+      statusCode: 400,
+      data: {
+        message: 'User is already registered'
+      }
+    };
   }
   const salt = randomBytes(16).toString('hex');
   const hashedPassword = scryptSync(password, salt, 64).toString('hex');
 
-  const { insertedId } = await db.get().collection('users').findOneAndUpdate({
+  const { insertedId } = await db.get('users').insertOne({
     email,
     secret: `${salt}:${hashedPassword}`,
     type
   }, {
     upsert: true
+  }).catch((dbErr) => {
+    console.log(dbErr);
+    return {
+      statusCode: 500,
+      data: {
+        message: 'DB Insertion Error'
+      }
+    };
   });
-  if (insertedId) return getToken(insertedId);
-  return { success: false };
+  if (insertedId) return {
+    statusCode: 200,
+    data: {
+      token: await getToken(insertedId)
+    }
+  };
+  return {
+    statusCode: 500,
+    data: {
+      message: 'Something went wrong!'
+    }
+  }
 }
 
 
@@ -31,21 +54,36 @@ const login = async ({
   email,
   password
 }) => {
-  const user = await db.get().collection('users').findOne({ email });
-  if (user) {
-    const [salt, key] = user.secret.split(':');
-    const hashedBuffer = scryptSync(password, salt, 64);
-    const keyBuffer = Buffer(key, 'hex');
-    const match = timingSafeEqual(hashedBuffer, keyBuffer);
-
-    if (match) {
-      const token = await getToken(user._id);
-      return { success: true, token };
-    } else {
-      throw new Error('Login failed');
-    }
+  const user = await db.get('users').findOne({ email });
+  if (!user) {
+    return {
+      statusCode: 400,
+      data: {
+        message: 'User not registered'
+      }
+    };
   }
-  throw new Error('User not registered');
+  const[salt, key] = user.secret.split(':');
+  const hashedBuffer = scryptSync(password, salt, 64);
+  const keyBuffer = Buffer(key, 'hex');
+  const match = timingSafeEqual(hashedBuffer, keyBuffer);
+
+  if (match) {
+    return { 
+      statusCode: 200,
+      data: {
+        token : await getToken(user._id),
+        message: 'Login success!'
+      }
+     };
+  } else {
+    return { 
+      statusCode: 500,
+      data: {
+        message: 'Something went wrong. Login failed!'
+      }
+     };
+  }
 }
 
 const getToken = async (_id) => {

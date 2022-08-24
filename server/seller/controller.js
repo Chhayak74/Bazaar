@@ -1,6 +1,9 @@
-const service = require( './service.js');
+const service = require('./service.js');
+const validation = require('./validation.js');
+
 const createCatalog = async (req, res, next) => {
   try {
+    await validation.createCatalog(req.body);
     const {
       name,
       imgUrl,
@@ -8,29 +11,36 @@ const createCatalog = async (req, res, next) => {
       products
     } = req.body;
 
-    const data = await service.createCatalog({
+    const { statusCode, data } = await service.createCatalog({
       name,
       imgUrl,
       category,
       products,
       userId: req.user._id
     });
-    return res.send(data);
+    return res.status(statusCode).send(data);
   } catch (ex) {
-    return next(ex);
+    console.log(ex);
+    return res.status(400).send({
+      message: ex.message ?? ex
+    });
   }
 };
 
 const orders = async (req, res, next) => {
   try {
-    const data = await service.orders(userId);
-    return res.send(data);
+    const { statusCode, data } = await service.orders({
+      sellerId: req.user._id
+    });
+    return res.status(statusCode).send(data);
   } catch (ex) {
     console.log(ex);
-    return next(ex);
+    return res.status(400).send({
+      message: ex.message ?? ex
+    });
   }
 }
-module.exports =  {
+module.exports = {
   orders,
   createCatalog
 };

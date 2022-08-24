@@ -12,8 +12,8 @@ const connect = async(callback) => {
   console.log('Connected to db!');
   callback();
 }
-const get = () => {
-  return mongoDb.db('bazaar');
+const get = (name) => {
+  return mongoDb.db('bazaar').collection(name);
 }
 
 const close = () => {
